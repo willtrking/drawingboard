@@ -6,6 +6,22 @@ from distutils.sysconfig import get_python_lib
 
 from drawingboard import __version__, constants
 
+setup(
+    name = 'drawingboard',
+    version = __version__,
+    description = 'Web UI for Netflix aminator',
+    author = 'William King',
+    author_email = 'willtrking@gmail.com',
+    zip_safe = False,
+    include_package_data = True,
+    packages=find_packages(),
+    requires=['flask','dogpile.cache'],
+    entry_points="""
+    [console_scripts]
+    drawingboard=drawingboard.app:start
+    """
+)
+
 try:
     if sys.argv[1] == 'install':
         def mkdir_p(path):
@@ -26,19 +42,3 @@ try:
         os.chmod('/etc/drawingboard/bin', st.st_mode | stat.S_IEXEC)
 
 except IndexError: pass
-
-setup(
-    name = 'drawingboard',
-    version = __version__,
-    description = 'Web UI for Netflix aminator',
-    author = 'William King',
-    author_email = 'willtrking@gmail.com',
-    zip_safe = False,
-    include_package_data = True,
-    packages=find_packages(),
-    requires=['flask','dogpile.cache'],
-    entry_points="""
-    [console_scripts]
-    drawingboard=drawingboard.app:start
-    """
-)

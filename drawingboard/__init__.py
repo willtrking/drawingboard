@@ -1,15 +1,15 @@
 # coding: utf-8
 
-import os
-from flask import Flask
-
-from .endpoints import init as init_endpoints
-from .db import init as init_db
-from .views import init as init_views
-
 __version__ = "0.1"
 
 def create_app(config):
+    import os
+    from flask import Flask
+
+    from .endpoints import init as init_endpoints
+    from .db import init as init_db
+    from .views import init as init_views
+
     _dir = os.path.dirname(os.path.realpath(__file__))
     app = Flask(
         __name__.split('.')[0],
