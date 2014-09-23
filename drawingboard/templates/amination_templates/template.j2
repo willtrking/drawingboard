@@ -1,0 +1,189 @@
+{% extends "base.j2" %}
+
+{% block script_footer %}
+  <script>
+    $(document).ready(function() {
+      $('#template_version_list').dataTable({
+        "aaSorting": [[2,'desc']]
+      });
+
+      var base_cli = $('#base_cli_arg').clone().removeAttr('id');
+      $('#add_cli_arg').click(function(){
+        $('#cli_arg_container').append($(base_cli).clone());
+      });
+
+
+      $('#create_template_version').click(function(){
+        var data = {
+          parent:{{ base_info['id'] }},
+          provisioner:$('#amination_provisioner').val(),
+          cli_args:[]
+        };
+
+        $('div[name=cli_arg_group]').each(function(){
+          var arg = $(this).find('input[name=cli_arg_arg]').val().trim();
+          var value = $(this).find('input[name=cli_arg_value]').val().trim();
+          if(arg || value){
+            data['cli_args'].push({
+              'name':arg,
+              'value':value
+            });
+          }
+        });
+
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          processData: false,
+          type: 'PUT',
+          url: '{{ url_for("rest_amination_templates.create_version") }}',
+          success: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+          error: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+        });
+
+      });
+
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="col-md-10">
+    <div class="content-box-large">
+      <div class="panel-heading">
+        <div class="panel-title">Amination Template</div>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <span class="form-control">{{ base_info['name'] }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                {% if base_info['append_date'] %}
+                  <input type="checkbox" checked="checked" disabled="disabled"> Append date to name
+                {% else %}
+                  <input type="checkbox" disabled="disabled">   Append date to name
+                {% endif %}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Tags</label>
+          <div class="col-sm-10">
+            {% set tags = [] %}
+            {% for tag in base_info['tags'] %}
+              {% do tags.append(tag['tag']) %}
+            {% endfor %}
+            <span class="form-control">{{ tags|join(', ') }}</span>
+          
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <div class="row" style="font-size:14px;">
+              {{ base_info['description'] }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="content-box-large">
+        <div class="panel-heading">
+          <div class="panel-title">Add Amination Template Version</div>
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal" role="form">
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Aminator Provisioner Argument</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" placeholder="my-app/provision.yml" id="amination_provisioner">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Aminator CLI Arguments</label>
+              <div class="col-sm-10">
+                <div id="cli_arg_container">
+                  <div class="row" id="base_cli_arg" name="cli_arg_group">
+                      <div class="col-sm-3">
+                        <input type="text" class="form-control" placeholder="--argument" name="cli_arg_arg">
+                      </div>
+                      <div class="col-sm-5">
+                        <input type="text" class="form-control" placeholder="value" name="cli_arg_value">
+                      </div>
+                      <div class="col-sm-2">
+                        <button type="button" class="btn btn-danger btn-xs" onclick="$(this).parent().parent().remove()">Remove</button>
+                      </div>
+                  </div>
+                </div>
+                <div>
+                  <button type="button" class="btn btn-lg btn-block btn-primary" id="add_cli_arg">Add CLI Argument</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" class="btn btn-primary" id="create_template_version">Create</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    <div class="content-box-large">
+      <div class="panel-heading">
+        <div class="panel-title">Amination Template Versions</div>
+      </div>
+      <div class="panel-body">
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="template_version_list">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Version</th>
+              <th>Provisioner</th>
+              <th>CLI Args</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for version in versions %}
+              {{ version['cli_args'] }}
+              <tr class="odd gradeX">
+                <td>{{ version['id'] }}</td>
+                <td>{{ version['name'] }}</td>
+                <td>{{ version['version'] }}</td>
+                <td>{{ version['provisioner'] }}</td>
+                <td>{{ version['cli']|format_cli_args }}</td>
+                <td>{{ version['created'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+{% endblock %}

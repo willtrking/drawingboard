@@ -1,0 +1,3 @@
+recursive-include drawingboard/bin *
+recursive-include drawingboard/static *
+recursive-include drawingboard/templates *

@@ -1,0 +1,104 @@
+#!/bin/bash
+
+#This script will run our amination and also copy the AMI to various regions
+#Requires the AWS CLI
+
+
+#Retrieve args
+AMINATION_DIR=$1
+AMINATOR_COMMAND=$2
+FROM_REGION=$3
+TO_REGIONS=$4
+
+#Setup vars
+STDOUT="$AMINATION_DIR/stdout"
+STDERR="$AMINATION_DIR/stderr"
+AMINATOR_EXIT_CODE_FILE="$AMINATION_DIR/aminator_exit_code"
+AMI_ID_FILE="$AMINATION_DIR/ami_id"
+REGIONS_EXIT_CODE="$AMINATION_DIR/region_exit_code"
+
+
+
+### SETUP FILES ###
+
+touch $STDOUT
+cat /dev/null > $STDOUT
+
+touch $STDERR
+cat /dev/null > $STDERR
+
+touch $AMINATOR_EXIT_CODE_FILE
+cat /dev/null > $AMINATOR_EXIT_CODE_FILE
+
+touch $AMI_ID_FILE
+cat /dev/null > $AMI_ID_FILE
+
+touch $REGIONS_EXIT_CODE
+cat /dev/null > $REGIONS_EXIT_CODE
+
+### END SETUP FILES ###
+
+
+### AMINATION ###
+
+echo "---AMINATING---" >> $STDOUT
+echo "---AMINATING---" >> $STDERR
+
+eval $AMINATOR_COMMAND 2>> $STDERR 1>>$STDOUT
+
+AMINATOR_EXIT_CODE=$?
+echo $AMINATOR_EXIT_CODE > $AMINATOR_EXIT_CODE_FILE
+
+if [ $AMINATOR_EXIT_CODE != 0 ]; then
+	exit 1
+fi
+
+LAST_LINE=$(tail -n 1 $STDOUT)
+
+AMI_ID=$(echo $LAST_LINE | awk '{print substr($0,index($0,"AMI: ")+5)}')
+
+echo $AMI_ID > $AMI_ID_FILE
+
+### END AMINATION ###
+
+
+### REGION COPY ###
+
+echo "---COPYING TO REGIONS---" >> $STDOUT
+echo "---COPYING TO REGIONS---" >> $STDERR
+
+while IFS=';' read -ra REGION_ARR; do
+	for i in "${REGION_ARR[@]}"; do
+		#Setup vars
+		REGION_FILE="$AMINATION_DIR/region_ami_id_$i"
+		REGION_STATUS_FILE="$AMINATION_DIR/region_ami_id_exit_code_$i"
+
+		#Setup files
+		touch $REGION_FILE
+		cat /dev/null > $REGION_FILE
+		touch $REGION_STATUS_FILE
+		cat /dev/null > $REGION_STATUS_FILE
+
+		echo "---COPYING TO $i FROM $FROM_REGION---" >> $STDOUT
+		echo "---COPYING TO $i FROM $FROM_REGION---" >> $STDERR
+
+		#Copy
+		aws ec2 copy-image --source-image-id $AMI_ID --source-region $FROM_REGION --region $i --output text 2>> $STDERR 1>>$STDOUT
+
+		COPY_EXIT_CODE=$?
+		echo $COPY_EXIT_CODE > $REGION_STATUS_FILE
+		if [ $COPY_EXIT_CODE != 0 ]; then
+			echo "FAILURE" > $REGION_FILE
+		else
+			REGION_LINE=$(tail -n 1 $STDOUT)
+			echo $REGION_LINE > $REGION_FILE
+		fi
+
+      done
+ done <<< "$TO_REGIONS"
+
+### END REGION COPY ###
+
+
+echo "---DONE---" >> $STDOUT
+echo "---DONE---" >> $STDERR

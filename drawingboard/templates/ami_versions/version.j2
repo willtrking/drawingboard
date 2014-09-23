@@ -1,0 +1,179 @@
+{% extends "base.j2" %}
+
+{% block script_footer %}
+  <script>
+    $(document).ready(function() {
+      $('#ami_version_list').dataTable();
+
+      $('#create_ami_version').click(function(){
+        var data = {
+          template:$('input[name=ami_version_template]').val(),
+          parent:{{ base_info['id'] }}
+        };
+
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          processData: false,
+          type: 'PUT',
+          url: '{{ url_for("rest_ami_versions.create_version") }}',
+          success: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+          error: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+        });
+
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="col-md-10">
+    <div class="content-box-large">
+      <div class="panel-heading">
+        <div class="panel-title">Base AMI</div>
+      </div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <span class="form-control">{{ base_info['name'] }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                {% if base_info['append_date'] %}
+                  <input type="checkbox" checked="checked" disabled="disabled"> Append date to name
+                {% else %}
+                  <input type="checkbox" disabled="disabled">   Append date to name
+                {% endif %}
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                {% if base_info['append_version'] %}
+                  <input type="checkbox" checked="checked" disabled="disabled"> Append version to name
+                {% else %}
+                  <input type="checkbox" disabled="disabled"> Append version to name
+                {% endif %}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Amination Template</label>
+          <div class="col-sm-10">
+            <span class="form-control"><a href="{{ url_for('amination_templates.template',base=base_info['template']) }}">{{ template_map[base_info['template']]['name'] }}</a></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Tags</label>
+          <div class="col-sm-10">
+            {% set tags = [] %}
+            {% for tag in base_info['tags'] %}
+              {% do tags.append(tag['tag']) %}
+            {% endfor %}
+            <span class="form-control">{{ tags|join(', ') }}</span>
+          </div>
+        </div>
+          <div class="form-group">
+            <label class="col-md-2 control-label" for="multiselect1">AWS Regions</label>
+            <div class="col-md-10">
+              <select multiple="multiple" id="multiselect-1" class="form-control custom-scroll" title="Select region(s)" style="height:200px;" disabled="disabled">
+                {% for region in regions %}
+                  {% if region_map[region['region']] %}
+                    <option value="{{ region['region'] }}" selected="selected">{{ region['name'] }} ({{ region['region'] }})</option>
+                  {% else %}
+                    <option value="{{ region['region'] }}">{{ region['name'] }} ({{ region['region'] }})</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Description</label>
+            <div class="col-sm-10">
+              <div class="row" style="font-size:14px;">{{ base_info['description'] }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-box-large">
+        <div class="panel-heading">
+          <div class="panel-title">Add AMI Version</div>
+        </div>
+        <div class="panel-body">
+          <form class="form-horizontal" role="form">
+            <div class="form-group">
+              <label for="inputEmail3" class="col-sm-2 control-label">Template version</label>
+              <div class="col-sm-10">
+                <div class="bfh-selectbox" data-name="ami_version_template" data-value="0" data-filter="true">
+                  
+                  <div data-value="0">Select version of base template</div>
+
+                  {% for _, template in template_map.iteritems() %}
+                    {% if template['id'] != base_info['template'] %}
+                      {% set tags = [] %}
+                      {% for tag in template['tags'] %}
+                        {% do tags.append(tag['tag']) %}
+                      {% endfor %}
+                      <div data-value="{{ template['id'] }}">v{{ template['version'] }} / {{ template['created'] }}</div>
+                    {% endif %}
+                  {% endfor %}
+                  
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" class="btn btn-primary" id="create_ami_version">Create</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <div class="content-box-large">
+        <div class="panel-heading">
+          <div class="panel-title">AMI Versions</div>
+        </div>
+        <div class="panel-body">
+          <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="ami_version_list">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Version #</th>
+                <th>Template</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for version in base_info['versions'] %}
+                <tr class="odd gradeX">
+                  <td>{{ version['id'] }}</td>
+                  <td>{{ version['name'] }}</td>
+                  <td>{{ version['version'] }}</td>
+                  <td>{{ template_map[version['template']]['name'] }}</td>
+                  <td>{{ version['created'] }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock %}

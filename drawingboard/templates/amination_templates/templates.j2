@@ -1,0 +1,142 @@
+{% extends "base.j2" %}
+
+{% block script_footer %}
+  <script>
+    $(document).ready(function() {
+      $('#ami_version_list').dataTable();
+
+      {% set _tags = [] %}
+      {% for tag in tags %}
+        {% do _tags.append(tag['tag']) %}
+      {% endfor %}
+      $("#tags").tags({
+        suggestions: JSON.parse('{{ _tags|tojson }}'),
+        tagData: []
+      });
+
+      var base_cli = $('#base_cli_arg').clone().removeAttr('id');
+      $('#add_cli_arg').click(function(){
+        $('#cli_arg_container').append($(base_cli).clone());
+      });
+
+      $('#create_template').click(function(){
+        var data = {
+          name:$('#amination_template_name').val(),
+          append_date:$('#append_date').is(':checked'),
+          append_version:$('#append_version').is(':checked'),
+          tags:$('#tags').tags().getTags(),
+          description:$('#amination_template_description').val(),
+          provisioner:'',
+          cli_args:[]
+        };
+
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          processData: false,
+          type: 'PUT',
+          url: '{{ url_for("rest_amination_templates.create_base") }}',
+          success: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+          error: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+        });
+
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="col-md-10">
+
+    <div class="content-box-large">
+      <div class="panel-heading">
+      <div class="panel-title">Amination Templates</div>
+    </div>
+    <div class="panel-body">
+      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="ami_version_list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Tags</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for template in templates %}
+            {% set tags = [] %}
+            {% for tag in template['tags'] %}
+              {% do tags.append(tag['tag']) %}
+            {% endfor %}
+            <tr class="odd gradeX">
+              <td>{{ template['id'] }}</td>
+              <td><a href="{{ url_for('amination_templates.template',base=template['id']) }}">{{ template['name'] }}</a></td>
+              <td>{{ tags|join(',') }}</td>
+              <td>{{ template['created'] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-box-large">
+    <div class="panel-heading">
+      <div class="panel-title">Add Base Amination Template</div>                
+    </div>
+    <div class="panel-body">
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="amination_template_name" placeholder="My Template(-v1234)(-2014-10-16 12:00:00)">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="append_date"> Append date to name
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="append_version"> Append version to name
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Tags</label>
+          <div class="col-sm-10">
+            <div id="tags"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea class="form-control" placeholder="Description" rows="3" id="amination_template_description"></textarea>
+          </div>
+        </div>
+                     
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="button" class="btn btn-primary" id="create_template">Create</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

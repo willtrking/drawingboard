@@ -1,0 +1,172 @@
+{% extends "base.j2" %}
+
+{% block script_footer %}
+  <script>
+    var prev_ami_version_base_id = -1;
+    $(document).ready(function() {
+      $('#ami_version_list').dataTable();
+      {% set _tags = [] %}
+      {% for tag in tags %}
+        {% do _tags.append(tag['tag']) %}
+      {% endfor %}
+      $("#tags").tags({
+        suggestions: JSON.parse('{{ _tags|tojson }}'),
+        tagData: []
+      });
+
+
+      $('#create_ami_version').click(function(){
+        var data = {
+          template:$('input[name=ami_version_base_template]').val(),
+          name:$('#amination_template_name').val(),
+          append_date:$('#ami_append_date').is(':checked'),
+          append_version:$('#ami_append_version').is(':checked'),
+          tags:$('#tags').tags().getTags(),
+          description:$('#ami_description').val(),
+          regions:$('#ami_region_select').val()
+        };
+
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          processData: false,
+          type: 'PUT',
+          url: '{{ url_for("rest_ami_versions.create_base") }}',
+          success: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+          error: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+        });
+
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="col-md-10">
+
+    <div class="content-box-large">
+      <div class="panel-heading">
+      <div class="panel-title">Base AMI Versions</div>
+    </div>
+    <div class="panel-body">
+      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="ami_version_list">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Tags</th>
+            <th># Of Versions</th>
+            <th>AWS Regions</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for version in versions %}
+            {% set tags = [] %}
+            {% for tag in version['tags'] %}
+              {% do tags.append(tag['tag']) %}
+            {% endfor %}
+
+            {% set regions = [] %}
+            {% for region in version['regions'] %}
+              {% do regions.append(region['region']) %}
+            {% endfor %}
+
+            <tr class="odd gradeX">
+              <td>{{ version['id'] }}</td>
+              <td><a href="{{ url_for('ami_versions.version',base=version['id']) }}">{{ version['name'] }}</a></td>
+              <td>{{ tags|join(',') }}</td>
+              <td>{{ version['versions']|length }}</td>
+              <td>{{ regions|join(',') }}</td>
+              <td>{{ version['created'] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-box-large">
+    <div class="panel-heading">
+      <div class="panel-title">Add Base AMI Version</div>              
+    </div>
+    <div class="panel-body">
+      <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Amination Template</label>
+          <div class="col-sm-10">
+            <div class="bfh-selectbox" data-name="ami_version_base_template" data-value="0" data-filter="true" id="ami_version_base_template">
+              <div data-value="0">Select base template</div>
+              {% for template in templates %}
+                {% set tags = [] %}
+                {% for tag in template['tags'] %}
+                  {% do tags.append(tag['tag']) %}
+                {% endfor %}
+                <div data-value="{{ template['id'] }}">{{ template['id'] }} / {{ template['name'] }} / {{ tags|join(',') }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <input type="text" class="form-control" id="amination_template_name" placeholder="My AMI(-v1234)(-2014-10-16 12:00:00)">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="ami_append_date"> Append date to name
+              </label>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" id="ami_append_version"> Append version to name
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputEmail3" class="col-sm-2 control-label">Tags</label>
+          <div class="col-sm-10">
+            <div id="tags"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea class="form-control" placeholder="Description" rows="3" id="ami_description"></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label" for="multiselect1">AWS Regions</label>
+          <div class="col-md-10">
+            <select multiple="multiple" class="form-control custom-scroll" title="Select region(s)" style="height:200px;" id="ami_region_select">
+              {% for region in regions %}
+                <option value="{{ region['region'] }}">{{ region['name'] }} ({{ region['region'] }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="button" class="btn btn-primary" id="create_ami_version">Create</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
