@@ -4,11 +4,11 @@ import sys, os, errno, shutil, stat
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 
-import drawingboard
+from drawingboard import __version__, constants
 
 setup(
     name = 'drawingboard',
-    version = drawingboard.__version__,
+    version = __version__,
     description = 'Web UI for Netflix aminator',
     author = 'William King',
     author_email = 'willtrking@gmail.com',
@@ -35,7 +35,7 @@ try:
         mkdir_p('/etc/drawingboard/')
         mkdir_p('/etc/drawingboard/bin')
         mkdir_p('/etc/drawingboard/aminations/')
-        _dir = os.path.dirname(os.path.realpath(drawingboard.__file__))
+        _dir = os.path.dirname(os.path.realpath(constants.__file__))
         shutil.copy(_dir+'/bin/drawingboard_amination','/etc/drawingboard/bin')
         
         st = os.stat('/etc/drawingboard/bin')
