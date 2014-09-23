@@ -16,7 +16,7 @@ Create and start an 'amination':
 	Runs aminator proxied through a bash script which stores output for viewing through the UI. Also copies your AMI
 	to regions specifief in your 'AMI Version'
 
-Requires python2.7
+Requires python2.7 and an AWS CLI version with 'ec2 copy-image'
 
 This project was done very quickly and without many regards to style, so there may be some weirdness in the codebase.
 
