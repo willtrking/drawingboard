@@ -157,7 +157,7 @@ def start_amination(amination):
     template = load_template(amination['template'])
     ami = load_ami(amination['amiversion'])
 
-    _cli = template['cli']
+    _cli = list(template['cli'])
     _has_name = False
     for arg in _cli:
         if arg['name'].strip() == '-n':
@@ -187,13 +187,13 @@ def start_amination(amination):
 
 
     amination_dir = '/etc/drawingboard/aminations/'+amination['cache_key']
-    cli_status_file = "%s/exit_code"
+    cli_status_file = "%s/exit_code" % amination_dir
     mkdir_p(amination_dir)
 
-    aminator_command = 'aminate '+cli_to_str(template['cli'])+' '+template['provisioner']
+    aminator_command = 'aminate '+cli_to_str(_cli)+' '+template['provisioner']
     
     to_regions=";".join(_regions)
-    command = "/etc/drawingboard/bin/drawingboard_amination '%s' '%s' '%s' '%s' -- ; echo $? > %s" % (
+    command = '/etc/drawingboard/bin/drawingboard_amination \'%s\' \'%s\' \'%s\' \'%s\' -- ; echo $? > %s' % (
         amination_dir,
         aminator_command,
         from_region,
@@ -205,18 +205,12 @@ def start_amination(amination):
         "-c",
         command
     ]
+
     _process = subprocess.Popen(
         cli,
         stdin=None,
         stdout=None,
         stderr=None,
         close_fds=True
-    )
-    
-    sqlite3_conn.execute("UPDATE Aminations SET started = 1, pid =:pid WHERE id = :id",
-        {
-            "pid" : _process.pid,
-            "id" : amination['id']
-        }
     )
 

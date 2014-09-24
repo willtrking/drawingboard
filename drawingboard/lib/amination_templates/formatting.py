@@ -1,8 +1,24 @@
 # coding: utf-8
 
 import json
+import re
 
 from drawingboard.lib.tags import formatted_row as tag_formatted_row
+
+escape_reg = re.compile('([^0-9a-zA-Z]+)')
+
+def escape(str):
+    _str = escape_reg.split(str)
+    print _str
+    _final = ''
+    for _s in _str:
+        if _s != '':
+            if _s.isalnum():
+                _final += _s
+            else:
+                _final += '\\\\'+_s
+
+    return _final
 
 def cli_to_str(args):
     _str = ""
@@ -11,10 +27,8 @@ def cli_to_str(args):
             _str+=" "+arg['name']
 
         if arg['value']:
-            if arg['value'][0] != "'":
-                _str+=" '"+arg['value']+"'"
-            else:
-                _str+=" "+arg['value']
+            
+            _str+=" "+escape(arg['value'])
     
     return _str.strip()
 
