@@ -169,7 +169,7 @@ def start_amination(amination):
     if not _has_name:
         _cli.append({
             'name' : '-n',
-            'value' : ami['name'] 
+            'value' : '['+ami['name']']-'+amination['created']
         })
 
     
