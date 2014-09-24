@@ -19,7 +19,6 @@ def versions():
         'ami_versions/versions.j2',
         versions=versions,
         templates=templates,
-        regions=AWS_REGIONS,
         tags=all_tags()
     )
 

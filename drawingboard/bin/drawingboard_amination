@@ -3,17 +3,19 @@
 #This script will run our amination and also copy the AMI to various regions
 #Requires the AWS CLI
 
+set -euf -o pipefail
 
 #Retrieve args
-AMINATION_DIR=$1
-AMINATOR_COMMAND=$2
-FROM_REGION=$3
-TO_REGIONS=$4
+AMINATION_DIR="$1"
+AMINATOR_COMMAND="$2"
+FROM_REGION="$3"
+TO_REGIONS="$4"
 
 #Setup vars
 STDOUT="$AMINATION_DIR/stdout"
 STDERR="$AMINATION_DIR/stderr"
 AMINATOR_EXIT_CODE_FILE="$AMINATION_DIR/aminator_exit_code"
+AMINATOR_COMMAND_FILE="$AMINATION_DIR/aminator_command"
 AMI_ID_FILE="$AMINATION_DIR/ami_id"
 REGIONS_EXIT_CODE="$AMINATION_DIR/region_exit_code"
 
@@ -35,6 +37,10 @@ cat /dev/null > $AMI_ID_FILE
 
 touch $REGIONS_EXIT_CODE
 cat /dev/null > $REGIONS_EXIT_CODE
+
+touch $AMINATOR_COMMAND_FILE
+cat /dev/null > $AMINATOR_COMMAND_FILE
+echo $AMINATOR_COMMAND > $AMINATOR_COMMAND_FILE
 
 ### END SETUP FILES ###
 
@@ -102,3 +108,5 @@ while IFS=';' read -ra REGION_ARR; do
 
 echo "---DONE---" >> $STDOUT
 echo "---DONE---" >> $STDERR
+
+exit 0

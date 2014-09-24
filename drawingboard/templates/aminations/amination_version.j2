@@ -1,0 +1,92 @@
+{% extends "base.j2" %}
+
+{% block content %}
+	
+	<div class="col-md-10">
+		<div class="content-box-large">
+	      <div class="panel-heading">
+	        <div class="panel-title">Amination Info</div>
+	      </div>
+	      <div class="panel-body">
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Name</label>
+	          <div class="col-sm-10">
+	            <span class="form-control">{{ version_info['name'] }}</span>
+	          </div>
+	        </div>
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Parent</label>
+	          <div class="col-sm-10">
+	            <span class="form-control"><a href="{{ url_for('aminations.amination',base=base_info['id']) }}">
+	              {{ base_info['name'] }}
+	            </a></span>
+	          </div>
+	        </div>
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">AMI Version</label>
+	          <div class="col-sm-10" style="font-size:14px;">
+	          <span class="form-control">
+	            <a href="{{ url_for('ami_versions.version',base=base_info['amiversion']) }}">
+	              {{ ami_version['name'] }}
+	            </a>
+	           </span>
+	          </div>
+	        </div>
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Template Version</label>
+	          <div class="col-sm-10" style="font-size:14px;">
+	          <span class="form-control">
+	            <a href="{{ url_for('amination_templates.template',base=base_info['template']) }}">
+	              {{ template_version['name'] }}
+	            </a>
+	           </span>
+	          </div>
+	        </div>
+	        <div class="form-group">
+	          <label class="col-sm-2 control-label">Status</label>
+	          <div class="col-sm-10" style="font-size:14px;">
+	            <span class="form-control">{{ version_info['status'] }}</span>
+	          </div>
+	        </div>
+
+	        	<div class="form-group">
+		          <label class="col-sm-2 control-label">STDOUT</label>
+		          <div class="col-sm-10" style="font-size:14px;">
+		            <span class="form-control"><a href="{{ url_for('aminations.stdout',base=base_info['id'],version=version_info['id']) }}">View STDOUT</a></span>
+		          </div>
+		        </div>
+
+		        <div class="form-group">
+		          <label class="col-sm-2 control-label">STDERR</label>
+		          <div class="col-sm-10" style="font-size:14px;">
+		            <span class="form-control"><a href="{{ url_for('aminations.stderr',base=base_info['id'],version=version_info['id']) }}">View STDERR</a></span>
+		          </div>
+		        </div>
+
+	        	<div class="form-group">
+		          <label class="col-sm-2 control-label">Exit Code</label>
+		          <div class="col-sm-10" style="font-size:14px;">
+		            <span class="form-control">{{ version_info['exit_code'] }}</span>
+		          </div>
+		        </div>
+
+		        <div class="form-group">
+		          <label class="col-sm-2 control-label">Aminator Exit Code</label>
+		          <div class="col-sm-10" style="font-size:14px;">
+		            <span class="form-control">{{ version_info['aminator_exit_code'] }}</span>
+		          </div>
+		        </div>
+
+		        <div class="form-group">
+		          <label class="col-sm-2 control-label">Base region AMI ID</label>
+		          <div class="col-sm-10" style="font-size:14px;">
+		            <span class="form-control">{{ version_info['ami_id'] }}</span>
+		          </div>
+		        </div>
+			
+
+	      </div>
+	    </div>
+	</div>
+
+{% endblock %}

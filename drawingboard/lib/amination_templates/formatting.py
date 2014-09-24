@@ -11,14 +11,10 @@ def cli_to_str(args):
             _str+=" "+arg['name']
 
         if arg['value']:
-            if arg['name']:
-                if arg['value'][0] != "'":
-                    _str+=" '"+arg['value']+"'"
-                else:
-                    _str+=" "+arg['value']
-
+            if arg['value'][0] != "'":
+                _str+=" '"+arg['value']+"'"
             else:
-                _str+=arg['value']
+                _str+=" "+arg['value']
     
     return _str.strip()
 

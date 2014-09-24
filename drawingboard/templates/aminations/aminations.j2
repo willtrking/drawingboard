@@ -5,62 +5,11 @@
     var prev_ami_version_id = -1;
     $(document).ready(function() {
       $('#amination_list').dataTable();
-      
-      $('body').on('change.bfhselectbox',function(e){
-        var base_id = $('input[name=ami_version_base]').val();
-        base_id = parseInt(base_id);
-        
-        if (base_id == prev_ami_version_id){
-          return;
-        }
-        prev_ami_version_id = base_id;
-
-        var template = '<div class="bfh-selectbox" data-name="ami_version_version" data-value="0" data-filter="true" id="ami_version_version" style="display:none;"><div data-value="0">Select template version</div></div>';
-
-        $('#ami_version_version').remove();
-        
-
-        if(base_id <= 0){
-          return;
-        }else{
-          $('#ami_version_version_container').html(template);
-          $.ajax({
-            contentType: 'application/json',
-            processData: false,
-            type: 'GET',
-            url: '{{ url_for("rest_ami_versions.get_bases") }}/'+base_id,
-            success: function(response){
-              if(response.success == false){
-                display_result(
-                  response.success,
-                  response.message,
-                  response.errors
-                );
-              }else{
-                for(i in response.message){
-                  var _version = response.message[i];
-                  $('#ami_version_version').append('<div data-value="'+_version['id']+'">v'+_version['version']+' '+_version['created']+'</div>')
-                }
-                $('#ami_version_version').attr('class','bfh-selectbox').bfhselectbox($('#ami_version_version').data()).css('display','block');
-              }
-            },
-            error: function(response){
-              display_result(
-                response.success,
-                response.message,
-                response.errors
-              );
-            },
-          });
-        }
-        
-      });
 
 
       $('#create_amination').click(function(){
         var data = {
           ami_version_base:$('input[name=ami_version_base]').val(),
-          ami_version:$('input[name=ami_version_version]').val(),
           name:$('#amination_name').val(),
           description:$('#amination_description').val(),
         };
@@ -105,7 +54,6 @@
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Status</th>
               <th>Template</th>
               <th>AMI Version</th>
               <th>Created</th>
@@ -116,9 +64,8 @@
               <tr class="odd gradeX">
                 <td>{{ amination['id'] }}</td>
                 <td><a href="{{ url_for('aminations.amination',base=amination['id']) }}">{{ amination['name'] }}</a></td>
-                <td></td>
-                <td><a href="{{ url_for('amination_templates.template',base=template_map[amination['template']]['parent']) }}">{{ template_map[amination['template']]['name'] }}</a></td>
-                <td><a href="{{ url_for('ami_versions.version',base=ami_map[amination['amiversion']]['parent']) }}">{{ ami_map[amination['amiversion']]['name'] }}</a></td>
+                <td><a href="">{{ template_map[amination['template']]['name'] }}</a></td>
+                <td><a href="">{{ ami_map[amination['amiversion']]['name'] }}</a></td>
                 <td>{{ amination['created'] }}</td>
               </tr>
             {% endfor %}
@@ -142,12 +89,6 @@
                   <div data-value="{{ base['id'] }}">{{ base['name'] }}</div>
                 {% endfor %}
               </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="inputEmail3" class="col-sm-2 control-label">AMI Version</label>
-            <div class="col-sm-10" id="ami_version_version_container">
-              <span>Select base AMI version first</span>
             </div>
           </div>
           <div class="form-group">

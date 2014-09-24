@@ -13,15 +13,13 @@ def _increment_version(version):
 
 def create_base_version(template,
         name,append_date,append_version,
-        tags,description,regions):
+        tags,description):
 
     
     template = load_base_template(template)
 
     if not template:
         raise RuntimeError("Unable to find base template with id %s" % template)
-
-    regions = retrieve_regions(regions,require_all=True)
 
     version = 0
     parent = 0
@@ -61,20 +59,12 @@ def create_base_version(template,
 
         sqlite3_conn.executemany("INSERT INTO AMIVersionsTags(`tag`,`amiversion`) VALUES (?,?)",_insert_tags)
 
-        _insert_regions = []
-        for _region in regions:
-            _insert_regions.append(
-                (_region['id'],_last_id[0],)
-            )
-
-        sqlite3_conn.executemany("INSERT INTO AMIVersionsRegions(`region`,`amiversion`) VALUES (?,?)",_insert_regions)
-
         sqlite3_conn.execute("COMMIT TRANSACTION;")
     except Exception as e:
         sqlite3_conn.execute("ROLLBACK TRANSACTION;")
         raise e
 
-def create_version_version(parent,template):
+def create_version_version(parent,template,base_region,regions):
     
     parent_version = load_base(parent)
 
@@ -85,7 +75,8 @@ def create_version_version(parent,template):
 
     tags = tags_for_version(parent)
 
-    regions = regions_for_version(parent)
+    regions.append(base_region)
+    regions = retrieve_regions(regions,require_all=True)
 
     try:
         sqlite3_conn.execute('BEGIN EXCLUSIVE TRANSACTION;')
@@ -135,11 +126,15 @@ def create_version_version(parent,template):
 
         _insert_regions = []
         for _region in regions:
+            base = 0
+            if _region['region'] == base_region:
+                base = 1
+            
             _insert_regions.append(
-                (_region['id'],_last_id[0],)
+                (_region['id'],_last_id[0],base,)
             )
 
-        sqlite3_conn.executemany("INSERT INTO AMIVersionsRegions(`region`,`amiversion`) VALUES (?,?)",_insert_regions)
+        sqlite3_conn.executemany("INSERT INTO AMIVersionsRegions(`region`,`amiversion`,`base`) VALUES (?,?,?)",_insert_regions)
 
 
         sqlite3_conn.execute('COMMIT TRANSACTION;')

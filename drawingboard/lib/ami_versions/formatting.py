@@ -18,8 +18,17 @@ def _base(row,tags,regions,versions):
         'created' : row['created'],
         'tags' : [],
         'regions' : [],
+        'base_region' : "",
         'versions' : versions
     }
+
+    base_region = None
+    for region in regions:
+        if region['base']:
+            r['base_region'] = region['region']
+
+    if not r['base_region'] and regions:
+        raise RuntimeError("Unable to load base region for ami version %s" % r['id'])
 
     for tag in tags:
         r['tags'].append(
@@ -27,9 +36,10 @@ def _base(row,tags,regions,versions):
         )
 
     for region in regions:
-        r['regions'].append(
-            region_formatted_row(region)
-        )
+        if not region['base']:
+            r['regions'].append(
+                region_formatted_row(region)
+            )
 
     return r
 
@@ -49,7 +59,7 @@ def formatted_version_row(row,tags,regions,versions):
         base['name']+="-"+base['created']
 
     del base['versions']
-
+    
     return base
 
 def formatted_base_row(row,tags,regions,versions):

@@ -1,5 +1,48 @@
 {% extends "base.j2" %}
 
+{% block script_footer %}
+  <script>
+    $(document).ready(function() {
+      $('#aminations_list').dataTable({
+        "aaSorting": [[2,'desc']]
+      });
+
+
+      $('#start_amination').click(function(){
+        var data = {
+          parent:{{ base_info['id'] }},
+          ami_version:$('input[name=ami_version_version]').val(),
+          start:true
+        };
+
+        $.ajax({
+          contentType: 'application/json',
+          data: JSON.stringify(data),
+          processData: false,
+          type: 'PUT',
+          url: '{{ url_for("rest_aminations.create_version") }}',
+          success: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+          error: function(response){
+            display_result(
+              response.success,
+              response.message,
+              response.errors
+            );
+          },
+        });
+
+      });
+
+    });
+  </script>
+{% endblock %}
+
 {% block content %}
   <div class="col-md-10">
     <div class="content-box-large">
@@ -10,16 +53,78 @@
         <div class="form-group">
           <label class="col-sm-2 control-label">Name</label>
           <div class="col-sm-10">
-            <span class="form-control">Weekly Push-2014-10-16 12:00:00</span>
+            <span class="form-control">{{ base_info['name'] }}</span>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-2 control-label">Amination Template</label>
           <div class="col-sm-10" style="font-size:14px;">
-            <a href="amination_template.html">Weekly Push</a>
+            <a href="{{ url_for('ami_versions.version',base=base_ami['id']) }}">
+              {{ base_ami['name'] }}
+            </a>
           </div>
         </div>
       </div>
     </div>
+  
+    <div class="content-box-large">
+      <div class="panel-heading">
+        <div class="panel-title">Start Amination</div>
+      </div>
+      <div class="panel-body">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">AMI version version</label>
+            <div class="col-sm-10">
+              <div class="bfh-selectbox" data-name="ami_version_version" data-value="0" data-filter="true">
+                
+                <div data-value="0">Select version of base AMI version</div>
+
+                {% for _, template in ami_map.iteritems() %}
+                    <div data-value="{{ template['id'] }}">v{{ template['version'] }} / {{ template['created'] }}</div>
+                {% endfor %}
+                
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" class="btn btn-primary" id="start_amination">Start</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="content-box-large">
+      <div class="panel-heading">
+        <div class="panel-title">Amination Template Versions</div>
+      </div>
+      <div class="panel-body">
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="aminations_list">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Version</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for amination in aminations %}
+              <tr class="odd gradeX">
+                <td>{{ amination['id'] }}</td>
+                <td><a href="{{ url_for('aminations.amination_version',base=base_info['id'],version=amination['id']) }}">{{ amination['name'] }}</a></td>
+                <td>{{ amination['version'] }}</td>
+                <td>{{ amination['status'] }}</td>
+                <td>{{ amination['created'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 {% endblock %}

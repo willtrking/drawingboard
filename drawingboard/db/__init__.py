@@ -23,6 +23,7 @@ def init():
         id INTEGER PRIMARY KEY,
         region INT,
         amiversion INT,
+        base BOOLEAN,
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
@@ -81,14 +82,16 @@ def init():
 
     sqlite3_conn.execute("""CREATE TABLE IF NOT EXISTS Aminations(
         id INTEGER PRIMARY KEY,
+        parent INT,
+        version INT,
         name TEXT,
         description TEXT,
         cache_key TEXT,
-        pid INT,
         started BOOLEAN,
         template INT,
         amiversion INT,
         append_date BOOLEAN,
+        append_version BOOLEAN,
         created DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)

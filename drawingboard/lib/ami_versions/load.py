@@ -22,7 +22,7 @@ def tags_for_version(version):
 
 def all_regions():
     with sqlite3_conn:
-        regions = sqlite3_conn.execute("""SELECT AWSRegions.*, AMIVersionsRegions.amiversion FROM AMIVersionsRegions 
+        regions = sqlite3_conn.execute("""SELECT AWSRegions.*, AMIVersionsRegions.amiversion,AMIVersionsRegions.base AS base FROM AMIVersionsRegions 
             INNER JOIN AWSRegions ON AMIVersionsRegions.region = AWSRegions.id"""
         ).fetchall()
 
@@ -30,7 +30,7 @@ def all_regions():
 
 def regions_for_version(version):
     with sqlite3_conn:
-        regions = sqlite3_conn.execute("""SELECT AWSRegions.* FROM AMIVersionsRegions 
+        regions = sqlite3_conn.execute("""SELECT AWSRegions.*,AMIVersionsRegions.base AS base FROM AMIVersionsRegions 
             INNER JOIN AWSRegions ON AMIVersionsRegions.region = AWSRegions.id WHERE AMIVersionsRegions.amiversion = :id""",
             {"id":version}
         ).fetchall()

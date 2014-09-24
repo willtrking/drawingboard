@@ -74,12 +74,6 @@ def create_base():
             tag_list = []
         description = data['description']
 
-        if not data['regions']:
-            raise RuntimeError("At least 1 region is required")
-        region_list = list(data['regions'])
-        if not region_list:
-            raise RuntimeError("At least 1 region is required")
-
     except Exception as e:
         return baseresponse(
             success=False,
@@ -94,8 +88,7 @@ def create_base():
         append_date=append_date,
         append_version=append_version,
         tags=tag_list,
-        description=description,
-        regions=region_list
+        description=description
     )
     except Exception as e:
         return baseresponse(
@@ -119,6 +112,14 @@ def create_version():
             raise RuntimeError("Bad parent id %s" % (parent))
 
         template = int(data['template'])
+
+        region_list = []
+        if data['regions']:
+            region_list = list(data['regions'])
+
+        base_region = data['base_region'].strip()
+        if not base_region:
+            raise RuntimeError("A base region is required")
         
     except Exception as e:
         return baseresponse(
@@ -130,7 +131,9 @@ def create_version():
     try:
         create_version_version(
             parent=parent,
-            template=template
+            template=template,
+            base_region=base_region,
+            regions=region_list
         )
     except Exception as e:
         return baseresponse(

@@ -1,0 +1,30 @@
+{% extends "base.j2" %}
+
+{% block content %}
+	
+	<div class="col-md-10">
+		<div class="content-box-large">
+			<div class="panel-heading">
+				<div class="panel-title">{{ type|upper }}</div>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Amination Version</label>
+					<div class="col-sm-10">
+						<span class="form-control">
+							<a href="{{ url_for('aminations.amination_version',base=version_info['parent'],version=version_info['id']) }}">
+								{{ version_info['name'] }}
+							</a>
+						</span>
+					</div>
+				</div>
+			</div>
+	    </div>
+	    <div class="content-box-large">
+	    	<pre>
+	    		{{ version_info[type|lower]|safe }}
+			</pre>
+	    </div>
+	</div>
+
+{% endblock %}
