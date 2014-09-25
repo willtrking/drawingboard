@@ -7,7 +7,7 @@ from drawingboard.lib.tags import formatted_row as tag_formatted_row
 
 escape_reg = re.compile('([^0-9a-zA-Z]+)')
 
-def escape(str):
+def _escape(str):
     """
         You're probably thinking 'uh, pipes.quote() maybe?'
         This would work IF we were simply passing these CLI vars to a single bash script
@@ -36,7 +36,7 @@ def cli_to_str(args,escape=False):
 
         if arg['value']:
             if escape:
-                _str+=" "+escape(arg['value'])
+                _str+=" "+_escape(arg['value'])
             else:
                 _str+=" "+arg['value']
     

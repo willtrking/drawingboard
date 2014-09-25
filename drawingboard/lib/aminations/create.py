@@ -137,11 +137,14 @@ def create_amination_version(amination_base,ami_version,start=False):
                 "id" : _last_id[0]
             }
         )
-        sqlite3_conn.execute("COMMIT;")
         if start:
-            return start_amination(_last_id[0])
+            _started = start_amination(_last_id[0])
+            sqlite3_conn.execute("COMMIT;")
+            return _started
         else:
+            sqlite3_conn.execute("COMMIT;")
             return _last_id[0]
+            
     except Exception as e:
         import traceback
         traceback.print_exc()
