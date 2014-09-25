@@ -139,7 +139,7 @@ def create_amination_version(amination_base,ami_version,start=False):
                 "id" : _last_id[0]
             }
         )
-        
+
         _id = _last_id[0] 
         sqlite3_conn.execute("COMMIT;")
 
@@ -178,10 +178,6 @@ def start_amination(amination):
             'name' : '-n',
             'value' : amination['name']
         })
-
-    
-    if not ami['regions']:
-        raise RuntimeError("Could not determine regions to use! Should be stored in ami version")
 
     if not ami['base_region']:
         raise RuntimeError("Could not determine base region to use! Should be stored in ami version")
