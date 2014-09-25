@@ -27,3 +27,9 @@ Requires python2.7 and an AWS CLI version with 'ec2 copy-image'
 This project was done very quickly and without many regards to style, so there may be some weirdness in the codebase.
 
 More details to follow
+
+Upcomming:
+- Supervisor conf
+- Usage guide
+- Configurable paths
+- Guide for safer setup (important due to bash script stuff)
