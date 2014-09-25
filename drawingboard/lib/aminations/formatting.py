@@ -70,18 +70,28 @@ def formatted_row(row,exit_code,
         region_exit_codes,
         region_ami_ids):
     if row['parent'] == 0:
-        return formatted_base_row(row,exit_code,
-            ami_id,stdout,stderr,
-            aminator_exit_code,
-            region_exit_codes,
-            region_ami_ids
+        return formatted_base_row(
+            row=row,
+            exit_code=exit_code,
+            ami_id=ami_id,
+            stdout=stdout,
+            stderr=stderr,
+            aminator_exit_code=aminator_exit_code,
+            aminator_command=aminator_command,
+            region_exit_codes=region_exit_codes,
+            region_ami_ids=region_ami_ids
         )
     else:
-        return formatted_version_row(row,exit_code,
-            ami_id,stdout,stderr,
-            aminator_exit_code,
-            region_exit_codes,
-            region_ami_ids
+        return formatted_version_row(
+            row=row,
+            exit_code=exit_code,
+            ami_id=ami_id,
+            stdout=stdout,
+            stderr=stderr,
+            aminator_exit_code=aminator_exit_code,
+            aminator_command=aminator_command,
+            region_exit_codes=region_exit_codes,
+            region_ami_ids=region_ami_ids
         )
 
 def formatted_version_row(row,exit_code,
@@ -90,11 +100,17 @@ def formatted_version_row(row,exit_code,
         aminator_command,
         region_exit_codes,
         region_ami_ids):
-    base = _base(row,exit_code,
-        ami_id,stdout,stderr,
-        aminator_exit_code,
-        region_exit_codes,
-        region_ami_ids
+
+    base = _base(
+        row=row,
+        exit_code=exit_code,
+        ami_id=ami_id,
+        stdout=stdout,
+        stderr=stderr,
+        aminator_exit_code=aminator_exit_code,
+        aminator_command=aminator_command,
+        region_exit_codes=region_exit_codes,
+        region_ami_ids=region_ami_ids
     )
 
     if base['append_version']:
@@ -111,9 +127,16 @@ def formatted_base_row(row,exit_code,
         aminator_command,
         region_exit_codes,
         region_ami_ids):
-    return _base(row,exit_code,
-        ami_id,stdout,stderr,
-        aminator_exit_code,
-        region_exit_codes,
-        region_ami_ids)
+
+    return _base(
+        row=row,
+        exit_code=exit_code,
+        ami_id=ami_id,
+        stdout=stdout,
+        stderr=stderr,
+        aminator_exit_code=aminator_exit_code,
+        aminator_command=aminator_command,
+        region_exit_codes=region_exit_codes,
+        region_ami_ids=region_ami_ids
+    )
     
