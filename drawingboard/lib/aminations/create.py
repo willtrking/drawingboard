@@ -87,6 +87,8 @@ def create_amination_version(amination_base,ami_version,start=False):
 
     ami_version = load_ami_version(parent_amination['amiversion'],ami_version)
     template = load_template_version(parent_amination['template'],ami_version['template'])
+    _id = None
+
     try:
         sqlite3_conn.execute('BEGIN EXCLUSIVE TRANSACTION;')
         parent = parent_amination['id']
@@ -137,13 +139,9 @@ def create_amination_version(amination_base,ami_version,start=False):
                 "id" : _last_id[0]
             }
         )
-        if start:
-            _started = start_amination(_last_id[0])
-            sqlite3_conn.execute("COMMIT;")
-            return _started
-        else:
-            sqlite3_conn.execute("COMMIT;")
-            return _last_id[0]
+        
+        _id = _last_id[0] 
+        sqlite3_conn.execute("COMMIT;")
 
     except Exception as e:
         import traceback
@@ -151,7 +149,13 @@ def create_amination_version(amination_base,ami_version,start=False):
         sqlite3_conn.execute("ROLLBACK;")
         raise e
 
-    return None
+    if start:
+        if _id is None:
+            raise RuntimeError("Failed to start amination, unable to determine ID!")
+
+        start_amination(_id)
+
+    
 
 
 def start_amination(amination):
