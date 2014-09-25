@@ -92,7 +92,7 @@
 		          </div>
 		        </div>
 
-		        {% for region,status in template_version['region_exit_codes'].iteritems() %}
+		        {% for region,status in version_info['region_exit_codes'].iteritems() %}
 		        	<div class="form-group">
 			          <label class="col-sm-2 control-label">Copying to {{ region }} exit code</label>
 			          <div class="col-sm-10" style="font-size:14px;">
@@ -101,7 +101,7 @@
 			        </div>
 		        {% endfor %}
 
-		        {% for region,ami in template_version['region_ami_ids'].iteritems() %}
+		        {% for region,ami in version_info['region_ami_ids'].iteritems() %}
 		        	<div class="form-group">
 			          <label class="col-sm-2 control-label">AMI ID for copied region{{ region }}</label>
 			          <div class="col-sm-10" style="font-size:14px;">
