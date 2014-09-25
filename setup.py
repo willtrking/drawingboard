@@ -15,7 +15,7 @@ setup(
     zip_safe = False,
     include_package_data = True,
     packages=find_packages(),
-    requires=['flask','dogpile.cache'],
+    install_requires=['flask','dogpile.cache'],
     entry_points="""
     [console_scripts]
     drawingboard=drawingboard.app:start
