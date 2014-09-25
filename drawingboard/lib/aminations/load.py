@@ -91,7 +91,7 @@ def _load(base):
                     region['region']
                 ))
 
-                region_ami_ids[region['region']] = _load_file('%s/region_ami_id_exit_code_%s' % (
+                region_ami_ids[region['region']] = _load_file('%s/region_ami_id_%s' % (
                     cache_path,
                     region['region']
                 ))
