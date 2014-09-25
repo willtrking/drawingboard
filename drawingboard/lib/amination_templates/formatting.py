@@ -5,7 +5,7 @@ import re
 
 from drawingboard.lib.tags import formatted_row as tag_formatted_row
 
-escape_reg = re.compile('([^0-9a-zA-Z]+)')
+escape_reg = re.compile('([^0-9a-zA-Z])')
 
 def _escape(str):
     """
