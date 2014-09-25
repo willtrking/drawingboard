@@ -169,7 +169,7 @@ def start_amination(amination):
     if not _has_name:
         _cli.append({
             'name' : '-n',
-            'value' : '['+ami['name']+']-'+amination['created']
+            'value' : amination['name']
         })
 
     
@@ -190,7 +190,7 @@ def start_amination(amination):
     cli_status_file = "%s/exit_code" % amination_dir
     mkdir_p(amination_dir)
 
-    aminator_command = 'aminate '+cli_to_str(_cli)+' '+template['provisioner']
+    aminator_command = 'aminate '+cli_to_str(_cli,escape=True)+' '+template['provisioner']
     
     to_regions=";".join(_regions)
     command = '/etc/drawingboard/bin/drawingboard_amination \'%s\' \'%s\' \'%s\' \'%s\' -- ; echo $? > %s' % (
@@ -212,5 +212,11 @@ def start_amination(amination):
         stdout=None,
         stderr=None,
         close_fds=True
+    )
+
+    sqlite3_conn.execute("UPDATE Aminations SET started = 1 WHERE id = :id",
+        {
+            "id" : amination['id']
+        }
     )
 

@@ -80,7 +80,7 @@ def _load(base):
         aminator_exit_code = _load_file('%s/aminator_exit_code' % cache_path)
 
         for region in ami['regions']:
-            if region['base']:
+            if region['region'] == ami['base_region']:
                 region_exit_codes[region['region']] = aminator_exit_code
                 region_ami_ids[region['region']] = ami_id
             else:

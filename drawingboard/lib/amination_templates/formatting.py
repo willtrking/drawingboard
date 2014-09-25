@@ -8,27 +8,37 @@ from drawingboard.lib.tags import formatted_row as tag_formatted_row
 escape_reg = re.compile('([^0-9a-zA-Z]+)')
 
 def escape(str):
+    """
+        You're probably thinking 'uh, pipes.quote() maybe?'
+        This would work IF we were simply passing these CLI vars to a single bash script
+        But we're not. We're proxying them through another bash script first
+
+        These ended up being the most reliable way to handle all possibilities.
+        Remember also that bash doesn't care if you escape all non-alphanumeric characters
+    """
     _str = escape_reg.split(str)
-    print _str
     _final = ''
+
     for _s in _str:
         if _s != '':
             if _s.isalnum():
                 _final += _s
             else:
-                _final += '\\\\'+_s
+                _final += '\\'+_s
 
     return _final
 
-def cli_to_str(args):
+def cli_to_str(args,escape=False):
     _str = ""
     for arg in args:
         if arg['name']:
             _str+=" "+arg['name']
 
         if arg['value']:
-            
-            _str+=" "+escape(arg['value'])
+            if escape:
+                _str+=" "+escape(arg['value'])
+            else:
+                _str+=" "+arg['value']
     
     return _str.strip()
 
