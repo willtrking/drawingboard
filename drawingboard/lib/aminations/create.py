@@ -144,7 +144,7 @@ def create_amination_version(amination_base,ami_version,start=False):
         else:
             sqlite3_conn.execute("COMMIT;")
             return _last_id[0]
-            
+
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -217,7 +217,7 @@ def start_amination(amination):
         close_fds=True
     )
 
-    sqlite3_conn.execute("UPDATE Aminations SET started = 1 WHERE id = :id",
+    sqlite3_conn.execute("UPDATE Aminations SET started = 1 WHERE id = :id LIMIT 1;",
         {
             "id" : amination['id']
         }
