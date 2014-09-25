@@ -19,6 +19,7 @@ def exit_code_status(code):
 def _base(row,exit_code,
         ami_id,stdout,stderr,
         aminator_exit_code,
+        aminator_command,
         region_exit_codes,
         region_ami_ids):
     r = {
@@ -65,6 +66,7 @@ def _base(row,exit_code,
 def formatted_row(row,exit_code,
         ami_id,stdout,stderr,
         aminator_exit_code,
+        aminator_command,
         region_exit_codes,
         region_ami_ids):
     if row['parent'] == 0:
@@ -85,6 +87,7 @@ def formatted_row(row,exit_code,
 def formatted_version_row(row,exit_code,
         ami_id,stdout,stderr,
         aminator_exit_code,
+        aminator_command,
         region_exit_codes,
         region_ami_ids):
     base = _base(row,exit_code,
@@ -105,6 +108,7 @@ def formatted_version_row(row,exit_code,
 def formatted_base_row(row,exit_code,
         ami_id,stdout,stderr,
         aminator_exit_code,
+        aminator_command,
         region_exit_codes,
         region_ami_ids):
     return _base(row,exit_code,

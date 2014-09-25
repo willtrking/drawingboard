@@ -63,6 +63,7 @@ def _load(base):
     ami_id = None
     stdout = None
     stderr = None
+    aminator_command = None
     aminator_exit_code = None
     region_exit_codes = {}
     region_ami_ids = {}
@@ -78,6 +79,7 @@ def _load(base):
         stdout = _load_file('%s/stdout' % cache_path)
         stderr = _load_file('%s/stderr' % cache_path)
         aminator_exit_code = _load_file('%s/aminator_exit_code' % cache_path)
+        aminator_command = _load_file('%s/aminator_command' % cache_path)
 
         for region in ami['regions']:
             if region['region'] == ami['base_region']:
@@ -101,6 +103,7 @@ def _load(base):
         stdout=stdout,
         stderr=stderr,
         aminator_exit_code=aminator_exit_code,
+        aminator_command=aminator_command,
         region_exit_codes=region_exit_codes,
         region_ami_ids=region_ami_ids
     )
