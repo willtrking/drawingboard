@@ -5,6 +5,7 @@ from flask import Blueprint, redirect, render_template, request, g
 from drawingboard.constants import AWS_REGIONS
 from drawingboard.lib.amination_templates import versions_for_base as versions_for_templates
 from drawingboard.lib.amination_templates import all_bases as all_templates
+from drawingboard.lib.amination_templates import load_base as load_base_template
 from drawingboard.lib.ami_versions import all_bases, load_base
 from drawingboard.lib.tags import all_tags
 
@@ -30,7 +31,7 @@ def version(base):
     template_map = {}
     for template in templates:
         template_map[template['id']] = template
-    template_map[base_info['template']] = load_base(base_info['template'])
+    template_map[base_info['template']] = load_base_template(base_info['template'])
 
     region_map = {}
     for region in base_info['regions']:

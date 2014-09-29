@@ -100,8 +100,8 @@ while IFS=';' read -ra REGION_ARR; do
 			echo $REGION_LINE > $REGION_FILE
 		fi
 
-      done
- done <<< "$TO_REGIONS"
+	done
+done <<< "$TO_REGIONS"
 
 ### END REGION COPY ###
 
